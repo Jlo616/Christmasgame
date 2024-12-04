@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christmas Lucky Draw Logic Puzzle</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 0 20px;
+            background-color: #fff5f5;
+        }
+        .clue {
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 4px solid #d32f2f;
+        }
+        .input-section {
+            margin: 20px 0;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        select {
+            padding: 5px;
+            margin: 0 5px;
+            min-width: 200px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #b71c1c;
+        }
+        button.tips-btn {
+            background-color: #1565c0;
+        }
+        button.tips-btn:hover {
+            background-color: #0d47a1;
+        }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .input-row {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .input-row label {
+            width: 100px;
+        }
+        .tips-section {
+            margin: 20px 0;
+            display: none;
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .tips-content {
+            margin-bottom: 15px;
+        }
+        .solution {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #90caf9;
+        }
+        .christmas-header {
+            color: #d32f2f;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .puzzle-description {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4caf50;
+        }
+        .present-value {
+            color: #2e7d32;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="christmas-header">🎄 Christmas Lucky Draw Mystery 🎄</h1>
+    
+    <div class="puzzle-description">
+        <p>Five friends attended a Christmas dinner with a lucky draw event. Each person prepared an expensive gift:</p>
+        <ul>
+            <li>Jason: iPhone 16 Pro 512GB (<span class="present-value">$10,000</span>)</li>
+            <li>Yuki: MacBook Pro 512GB (<span class="present-value">$9,000</span>)</li>
+            <li>Jenny: Outdoor Jacket (<span class="present-value">$3,000</span>)</li>
+            <li>Harris: 5 boxes of Pokemon Card Booster SV8a (<span class="present-value">$1,500</span>)</li>
+            <li>Charle: AirPods Max (<span class="present-value">$2,500</span>)</li>
+        </ul>
+        <p>After the lucky draw, each person received a different gift. Can you match who got which present?</p>
+    </div>
+
+    <div class="clues">
+        <h3>🎁 Clues:</h3>
+        <div class="clue">1. The person who got the iPhone was very happy as it was the most expensive gift</div>
+        <div class="clue">2. Yuki didn't get the MacBook Pro or the iPhone</div>
+        <div class="clue">3. Harris got the Outdoor Jacket</div>
+        <div class="clue">4. Jenny received something worth more than $5,000</div>
+        <div class="clue">5. Charle didn't get any Apple products</div>
+        <div class="clue">6. Jason was disappointed with his gift as it was the least expensive item</div>
+    </div>
+
+    <button class="tips-btn" onclick="toggleTips()">Show Tips & Solution</button>
+
+    <div id="tips-section" class="tips-section">
+        <div class="tips-content">
+            <h3>💡 Tips to solve the puzzle:</h3>
+            <ol>
+                <li>Start with Harris - we know they got the Outdoor Jacket</li>
+                <li>Jason got the least expensive item (Pokemon Cards)</li>
+                <li>Use the information about Jenny getting something over $5,000</li>
+                <li>Consider what's left for Charle and Yuki</li>
+            </ol>
+        </div>
+        <div class="solution">
+            <h3>✨ Solution:</h3>
+            <p><strong>Jason:</strong> Pokemon Card Booster ($1,500)</p>
+            <p><strong>Yuki:</strong> AirPods Max ($2,500)</p>
+            <p><strong>Jenny:</strong> MacBook Pro ($9,000)</p>
+            <p><strong>Harris:</strong> Outdoor Jacket ($3,000)</p>
+            <p><strong>Charle:</strong> iPhone 16 Pro ($10,000)</p>
+        </div>
+    </div>
+
+    <div class="input-section">
+        <h3>Enter your solution:</h3>
+        
+        <div class="input-row">
+            <label>Jason:</label>
+            <select id="jason-gift">
+                <option value="">Select Gift</option>
+                <option value="iphone">iPhone 16 Pro ($10,000)</option>
+                <option value="macbook">MacBook Pro ($9,000)</option>
+                <option value="jacket">Outdoor Jacket ($3,000)</option>
+                <option value="pokemon">Pokemon Cards ($1,500)</option>
+                <option value="airpods">AirPods Max ($2,500)</option>
+            </select>
+        </div>
+
+        <div class="input-row">
+            <label>Yuki:</label>
+            <select id="yuki-gift">
+                <option value="">Select Gift</option>
+                <option value="iphone">iPhone 16 Pro ($10,000)</option>
+                <option value="macbook">MacBook Pro ($9,000)</option>
+                <option value="jacket">Outdoor Jacket ($3,000)</option>
+                <option value="pokemon">Pokemon Cards ($1,500)</option>
+                <option value="airpods">AirPods Max ($2,500)</option>
+            </select>
+        </div>
+
+        <div class="input-row">
+            <label>Jenny:</label>
+            <select id="jenny-gift">
+                <option value="">Select Gift</option>
+                <option value="iphone">iPhone 16 Pro ($10,000)</option>
+                <option value="macbook">MacBook Pro ($9,000)</option>
+                <option value="jacket">Outdoor Jacket ($3,000)</option>
+                <option value="pokemon">Pokemon Cards ($1,500)</option>
+                <option value="airpods">AirPods Max ($2,500)</option>
+            </select>
+        </div>
+
+        <div class="input-row">
+            <label>Harris:</label>
+            <select id="harris-gift">
+                <option value="">Select Gift</option>
+                <option value="iphone">iPhone 16 Pro ($10,000)</option>
+                <option value="macbook">MacBook Pro ($9,000)</option>
+                <option value="jacket">Outdoor Jacket ($3,000)</option>
+                <option value="pokemon">Pokemon Cards ($1,500)</option>
+                <option value="airpods">AirPods Max ($2,500)</option>
+            </select>
+        </div>
+
+        <div class="input-row">
+            <label>Charle:</label>
+            <select id="charle-gift">
+                <option value="">Select Gift</option>
+                <option value="iphone">iPhone 16 Pro ($10,000)</option>
+                <option value="macbook">MacBook Pro ($9,000)</option>
+                <option value="jacket">Outdoor Jacket ($3,000)</option>
+                <option value="pokemon">Pokemon Cards ($1,500)</option>
+                <option value="airpods">AirPods Max ($2,500)</option>
+            </select>
+        </div>
+
+        <button onclick="checkAnswer()">Check Answer</button>
+    </div>
+
+    <div id="result"></div>
+
+    <script>
+        function toggleTips() {
+            const tipsSection = document.getElementById('tips-section');
+            const tipsButton = document.querySelector('.tips-btn');
+            
+            if (tipsSection.style.display === 'none' || !tipsSection.style.display) {
+                tipsSection.style.display = 'block';
+                tipsButton.textContent = 'Hide Tips & Solution';
+            } else {
+                tipsSection.style.display = 'none';
+                tipsButton.textContent = 'Show Tips & Solution';
+            }
+        }
+
+        function checkAnswer() {
+            const jasonGift = document.getElementById('jason-gift').value;
+            const yukiGift = document.getElementById('yuki-gift').value;
+            const jennyGift = document.getElementById('jenny-gift').value;
+            const harrisGift = document.getElementById('harris-gift').value;
+            const charleGift = document.getElementById('charle-gift').value;
+
+            // Check if all fields are filled
+            if (!jasonGift || !yukiGift || !jennyGift || !harrisGift || !charleGift) {
+                document.getElementById('result').innerHTML = "Please fill in all fields!";
+                document.getElementById('result').style.backgroundColor = "#ffebee";
+                return;
+            }
+
+            // Check if selections are unique
+            const gifts = [jasonGift, yukiGift, jennyGift, harrisGift, charleGift];
+            
+            if (new Set(gifts).size !== 5) {
+                document.getElementById('result').innerHTML = "Each person must receive a different gift!";
+                document.getElementById('result').style.backgroundColor = "#ffebee";
+                return;
+            }
+
+            // Check if the answer is correct
+            const correct = 
+                jasonGift === 'pokemon' && 
+                yukiGift === 'airpods' && 
+                jennyGift === 'macbook' && 
+                harrisGift === 'jacket' && 
+                charleGift === 'iphone';
+
+            if (correct) {
+                document.getElementById('result').innerHTML = "🎄 Congratulations! That's correct! 🎅";
+                document.getElementById('result').style.backgroundColor = "#e8f5e9";
+            } else {
+                document.getElementById('result').innerHTML = "Sorry, that's not correct. Try again!";
+                document.getElementById('result').style.backgroundColor = "#ffebee";
+            }
+        }
+    </script>
+</body>
+</html>
