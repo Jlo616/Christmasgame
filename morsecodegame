@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christmas Morse Code Challenge</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #1a472a;
+            background-image: linear-gradient(rgba(26, 71, 42, 0.9), rgba(26, 71, 42, 0.9)),
+                url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="2" fill="white" opacity="0.1"/></svg>');
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: #fff;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            max-width: 800px;
+            width: 100%;
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+        h1 {
+            color: #ff424f;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 2.5em;
+        }
+        .story {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+            border-left: 4px solid #ff424f;
+        }
+        .morse-display {
+            font-size: 24px;
+            margin: 20px 0;
+            min-height: 30px;
+            text-align: center;
+            display: none;
+            color: #ffd700;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            font-size: 16px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        button {
+            background: #ff424f;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s, background 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        button:hover {
+            background: #ff5c67;
+            transform: translateY(-2px);
+        }
+        .status {
+            margin: 20px 0;
+            font-weight: bold;
+            text-align: center;
+            color: #ffd700;
+        }
+        .correct-letters {
+            margin-top: 20px;
+            font-size: 28px;
+            letter-spacing: 8px;
+            text-align: center;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+        .success-message {
+            text-align: center;
+            color: #ffd700;
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+        .success-message a {
+            color: #ff424f;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .success-message a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Christmas Morse Code Challenge</h1>
+        <div class="story">
+            <p>While on her way to a Christmas dinner with friends, Yuki was watching her favorite YouTuber's latest video. 
+            Suddenly, an exciting morse code challenge appeared in the video! The YouTuber had hidden a special message 
+            in morse code, and Yuki couldn't resist trying to solve it. Can you help Yuki decode the message?</p>
+            <p>Listen carefully to the morse code beeps and try to decode each letter one by one...</p>
+        </div>
+        <div class="morse-display" id="morseDisplay"></div>
+        <input type="text" id="guessInput" placeholder="Enter your guess">
+        <div class="button-group">
+            <button onclick="checkGuess()">Submit Guess</button>
+            <button onclick="toggleSound()" id="soundToggle">Turn Sound On</button>
+            <button onclick="toggleTip()" id="tipButton">Show Tip</button>
+        </div>
+        <div class="status" id="status"></div>
+        <div class="correct-letters" id="correctLetters"></div>
+    </div>
+
+    <script>
+        const word = "SANTAJASON";
+        const morseCode = {
+            'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 
+            'F': '..-.', 'G': '--.', 'H': '....', 'I': '..', 'J': '.---',
+            'K': '-.-', 'L': '.-..', 'M': '--', 'N': '-.', 'O': '---',
+            'P': '.--.', 'Q': '--.-', 'R': '.-.', 'S': '...', 'T': '-',
+            'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-', 'Y': '-.--',
+            'Z': '--..', ' ': '/'
+        };
+
+        let currentLetterIndex = 0;
+        let isSoundOn = false;
+        let audioContext = null;
+        let guessedLetters = Array(word.length).fill('_');
+
+        function initAudio() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function toggleTip() {
+            const morseDisplay = document.getElementById('morseDisplay');
+            const tipButton = document.getElementById('tipButton');
+            
+            if (morseDisplay.style.display === 'none') {
+                morseDisplay.style.display = 'block';
+                tipButton.textContent = 'Hide Tip';
+            } else {
+                morseDisplay.style.display = 'none';
+                tipButton.textContent = 'Show Tip';
+            }
+        }
+
+        function playMorseCode(pattern) {
+            if (!isSoundOn || !audioContext) return;
+
+            const dotDuration = 100;
+            const dashDuration = dotDuration * 3;
+            let currentTime = audioContext.currentTime;
+
+            pattern.split('').forEach(symbol => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 600;
+                gainNode.gain.setValueAtTime(0.5, currentTime);
+
+                oscillator.start(currentTime);
+                
+                if (symbol === '.') {
+                    oscillator.stop(currentTime + dotDuration/1000);
+                    currentTime += dotDuration/1000 + 0.05;
+                } else if (symbol === '-') {
+                    oscillator.stop(currentTime + dashDuration/1000);
+                    currentTime += dashDuration/1000 + 0.05;
+                }
+            });
+        }
+
+        function toggleSound() {
+            if (!audioContext) {
+                initAudio();
+            }
+            isSoundOn = !isSoundOn;
+            document.getElementById('soundToggle').textContent = 
+                isSoundOn ? 'Turn Sound Off' : 'Turn Sound On';
+        }
+
+        function displayMorseLetter() {
+            const letter = word[currentLetterIndex];
+            const morsePattern = morseCode[letter];
+            document.getElementById('morseDisplay').textContent = morsePattern;
+            playMorseCode(morsePattern);
+        }
+
+        function updateCorrectLetters() {
+            document.getElementById('correctLetters').textContent = guessedLetters.join(' ');
+        }
+
+        function checkGuess() {
+            const guess = document.getElementById('guessInput').value.toUpperCase();
+            const currentLetter = word[currentLetterIndex];
+            
+            if (guess === currentLetter) {
+                document.getElementById('status').textContent = 'Correct!';
+                guessedLetters[currentLetterIndex] = currentLetter;
+                updateCorrectLetters();
+                currentLetterIndex++;
+                document.getElementById('guessInput').value = '';
+                
+                if (currentLetterIndex >= word.length) {
+                    const successMessage = `
+                        <div class="success-message">
+                            <h2>🎄 Congratulations! 🎄</h2>
+                            <p>You successfully decoded the message: ${word}</p>
+                            <p>Continue your Christmas adventure by clicking <a href="https://htmlpreview.github.io/?https://github.com/Jlo616/Christmasgame/blob/main/logicgame">here</a>!</p>
+                        </div>
+                    `;
+                    document.getElementById('status').innerHTML = successMessage;
+                    return;
+                }
+            } else {
+                document.getElementById('status').textContent = 'Try again!';
+            }
+        }
+
+        // Start displaying morse code
+        setInterval(() => {
+            if (currentLetterIndex < word.length) {
+                displayMorseLetter();
+            }
+        }, 3000);
+
+        // Initial display
+        displayMorseLetter();
+        updateCorrectLetters();
+    </script>
+</body>
+</html>
