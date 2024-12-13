@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santa's Present Delivery</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #1a1a2e, #16213e);
+            font-family: Arial, sans-serif;
+        }
+        #gameContainer {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            height: 600px;
+            background: linear-gradient(to bottom, #0f3460, #162447);
+            overflow: hidden;
+            border-radius: 20px; /* Rounded edges */
+        }
+        #santa {
+            position: absolute;
+            width: 50px; /* Smaller Santa */
+            height: 50px;
+            left: 50px;
+            background: url('https://raw.githubusercontent.com/Jlo616/Christmasgame/main/santa-claus.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            border: 3px solid white; /* Border around Santa */
+            border-radius: 10px; /* Rounded edges for the border */
+        }
+        .obstacle {
+            position: absolute;
+            width: 40px; /* Width of the obstacle */
+            background: red; /* Filled red color */
+            border-radius: 5px; /* Slightly rounded edges */
+        }
+        #startScreen, #gameOverScreen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            z-index: 10;
+        }
+        #gameOverScreen {
+            display: none;
+        }
+        .button {
+            padding: 15px 30px;
+            font-size: 20px;
+            background: #e94560;
+            border: none;
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        #scoreContainer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 24px;
+            text-align: right;
+        }
+        #finalScore {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        #message {
+            font-size: 24px;
+            text-align: center;
+            margin: 20px;
+            color: #ffd700;
+            display: none; /* Hide message by default */
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="startScreen">
+            <button class="button" id="startButton">Start Game</button>
+        </div>
+        <div id="gameOverScreen">
+            <div id="finalScore"></div>
+            <div id="message"></div>
+            <button class="button" id="tryAgainButton">Try Again</button>
+        </div>
+        <div id="santa"></div>
+        <div id="scoreContainer">
+            Score: <span id="score">0</span><br>
+            Target: 1
+        </div>
+    </div>
+
+    <script>
+        const santa = document.getElementById('santa');
+        const gameContainer = document.getElementById('gameContainer');
+        const startScreen = document.getElementById('startScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const startButton = document.getElementById('startButton');
+        const tryAgainButton = document.getElementById('tryAgainButton');
+        const scoreElement = document.getElementById('score');
+        const finalScoreElement = document.getElementById('finalScore');
+        const messageElement = document.getElementById('message');
+
+        let gameStarted = false;
+        let gameLoop;
+        let obstacles = [];
+        let velocity = 0;
+        let score = 0;
+        const gravity = 0.5;
+        const jump = -10; // Fixed jump height
+        const largeGapSize = 200; // Larger gap for first 6 scores
+        const normalGapSize = 150; // Normal gap after 6 scores
+
+        function startGame() {
+            gameStarted = true;
+            startScreen.style.display = 'none';
+            gameOverScreen.style.display = 'none';
+            santa.style.top = '250px';
+            score = 0;
+            scoreElement.textContent = score;
+            obstacles = [];
+            velocity = 0;
+
+            // Clear existing obstacles
+            const existingObstacles = document.querySelectorAll('.obstacle');
+            existingObstacles.forEach(obstacle => obstacle.remove());
+
+            gameLoop = setInterval(updateGame, 20);
+            setInterval(createObstacles, 3000); // Increased time between obstacles
+        }
+
+        function updateGame() {
+            velocity += gravity;
+            santa.style.top = parseInt(santa.style.top) + velocity + 'px';
+
+            // Check collisions with ground and ceiling
+            if (parseInt(santa.style.top) > gameContainer.offsetHeight - 60) {
+                endGame();
+            }
+            if (parseInt(santa.style.top) < 0) {
+                santa.style.top = '0px';
+                velocity = 0;
+            }
+
+            // Update obstacles
+            obstacles.forEach((obstacle, index) => {
+                obstacle.style.left = parseInt(obstacle.style.left) - 2 + 'px';
+
+                // Check collision
+                if (checkCollision(santa, obstacle)) {
+                    endGame();
+                }
+
+                // Remove off-screen obstacles
+                if (parseInt(obstacle.style.left) < -60) {
+                    obstacle.remove();
+                    obstacles.splice(index, 1);
+                    score++;
+                    scoreElement.textContent = score;
+                }
+            });
+        }
+
+        function createObstacles() {
+            if (!gameStarted) return;
+
+            // Determine gap size based on score
+            const gapSize = score < 6 ? largeGapSize : normalGapSize;
+
+            const gapPosition = Math.random() * (gameContainer.offsetHeight - gapSize - 100) + 50; // Random gap position
+
+            const topObstacle = document.createElement('div');
+            topObstacle.className = 'obstacle';
+            topObstacle.style.height = gapPosition + 'px';
+            topObstacle.style.left = gameContainer.offsetWidth + 'px';
+            topObstacle.style.top = '0';
+
+            const bottomObstacle = document.createElement('div');
+            bottomObstacle.className = 'obstacle';
+            bottomObstacle.style.height = (gameContainer.offsetHeight - gapPosition - gapSize) + 'px';
+            bottomObstacle.style.left = gameContainer.offsetWidth + 'px';
+            bottomObstacle.style.top = (gapPosition + gapSize) + 'px';
+
+            // Ensure no overlap
+            if (obstacles.length === 0 || parseInt(obstacles[obstacles.length - 1].style.left) < gameContainer.offsetWidth - 200) {
+                gameContainer.appendChild(topObstacle);
+                gameContainer.appendChild(bottomObstacle);
+                obstacles.push(topObstacle, bottomObstacle);
+            }
+        }
+
+        function checkCollision(santa, obstacle) {
+            const santaRect = santa.getBoundingClientRect();
+            const obstacleRect = obstacle.getBoundingClientRect();
+
+            return !(santaRect.right < obstacleRect.left || 
+                    santaRect.left > obstacleRect.right || 
+                    santaRect.bottom < obstacleRect.top || 
+                    santaRect.top > obstacleRect.bottom);
+        }
+
+        function endGame() {
+            gameStarted = false;
+            clearInterval(gameLoop);
+            finalScoreElement.textContent = `Final Score: ${score}`;
+            
+            // Show message based on score
+            if (score > 1) {
+                messageElement.textContent = "Congratulations! Please collect your present from Jason.";
+                messageElement.style.display = 'block'; // Show message
+            } else {
+                messageElement.style.display = 'none'; // Hide message
+            }
+            
+            gameOverScreen.style.display = 'flex';
+            obstacles.forEach(obstacle => obstacle.remove());
+            obstacles = [];
+        }
+
+        document.addEventListener('click', () => {
+            if (gameStarted) {
+                velocity = jump; // Fixed jump height
+            }
+        });
+
+        startButton.addEventListener('click', startGame);
+        tryAgainButton.addEventListener('click', startGame);
+    </script>
+</body>
+</html>
