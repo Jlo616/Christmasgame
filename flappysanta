@@ -123,7 +123,7 @@
         const gravity = 0.5;
         const jump = -10; // Fixed jump height
         const largeGapSize = 200; // Larger gap for first 6 scores
-        const normalGapSize = 150; // Normal gap after 6 scores
+        const normalGapSize = 200; // Normal gap after 6 scores
 
         function startGame() {
             gameStarted = true;
