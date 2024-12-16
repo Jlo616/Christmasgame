@@ -256,10 +256,11 @@
                 harrisGift === 'jacket' && 
                 charleGift === 'iphone';
 
-            if (correct) {
-                document.getElementById('result').innerHTML = "🎄 Congratulations! That's correct! 🎅";
+     
+        if (correct) {
+            document.getElementById('result').innerHTML = "🎄 Congratulations! That's correct! 🎅 <a href='https://htmlpreview.github.io/?https://github.com/Jlo616/Christmasgame/blob/main/flappysanta' target='_blank'>Click here to play Flappy Santa!</a>";
                 document.getElementById('result').style.backgroundColor = "#e8f5e9";
-            } else {
+            } else {https://htmlpreview.github.io/?https://github.com/Jlo616/Christmasgame/blob/main/flappysanta
                 document.getElementById('result').innerHTML = "Sorry, that's not correct. Try again!";
                 document.getElementById('result').style.backgroundColor = "#ffebee";
             }
