@@ -90,7 +90,7 @@
 <body>
     <div id="gameContainer">
         <div id="startScreen">
-            <p>Press Spacebar or Click to Start Game</p>
+            <p>Press Spacebar or Click to flap</p>
             <button class="button" id="startButton">Start Game</button>
         </div>
         <div id="gameOverScreen">
