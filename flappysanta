@@ -32,7 +32,7 @@
             background: url('https://raw.githubusercontent.com/Jlo616/Christmasgame/main/santa-claus.png');
             background-size: contain;
             background-repeat: no-repeat;
-            border: 3px solid white; /* Border around Santa */
+            border: 3px solid green; /* Green border around Santa */
             border-radius: 10px; /* Rounded edges for the border */
         }
         .obstacle {
@@ -100,7 +100,7 @@
         <div id="santa"></div>
         <div id="scoreContainer">
             Score: <span id="score">0</span><br>
-            Target: 1
+            Target: 12
         </div>
     </div>
 
@@ -122,8 +122,10 @@
         let score = 0;
         const gravity = 0.5;
         const jump = -10; // Fixed jump height
-        const largeGapSize = 200; // Larger gap for first 6 scores
-        const normalGapSize = 200; // Normal gap after 6 scores
+        const gapSize = 250; // Fixed gap size for all scores
+        const targetScore = 12; // Target score to win
+        let obstacleSpeed = 2; // Initial obstacle speed
+        let targetAchieved = false; // Tracks whether the target score was reached
 
         function startGame() {
             gameStarted = true;
@@ -134,6 +136,8 @@
             scoreElement.textContent = score;
             obstacles = [];
             velocity = 0;
+            obstacleSpeed = 2; // Reset obstacle speed
+            targetAchieved = false; // Reset target achievement status
 
             // Clear existing obstacles
             const existingObstacles = document.querySelectorAll('.obstacle');
@@ -158,7 +162,7 @@
 
             // Update obstacles
             obstacles.forEach((obstacle, index) => {
-                obstacle.style.left = parseInt(obstacle.style.left) - 2 + 'px';
+                obstacle.style.left = parseInt(obstacle.style.left) - obstacleSpeed + 'px';
 
                 // Check collision
                 if (checkCollision(santa, obstacle)) {
@@ -171,15 +175,22 @@
                     obstacles.splice(index, 1);
                     score++;
                     scoreElement.textContent = score;
+
+                    // Increase obstacle speed after score of 4
+                    if (score > 4) {
+                        obstacleSpeed *= 1.05;
+                    }
+
+                    // Mark target as achieved if the score reaches the target
+                    if (score >= targetScore) {
+                        targetAchieved = true;
+                    }
                 }
             });
         }
 
         function createObstacles() {
             if (!gameStarted) return;
-
-            // Determine gap size based on score
-            const gapSize = score < 6 ? largeGapSize : normalGapSize;
 
             const gapPosition = Math.random() * (gameContainer.offsetHeight - gapSize - 100) + 50; // Random gap position
 
@@ -218,8 +229,8 @@
             clearInterval(gameLoop);
             finalScoreElement.textContent = `Final Score: ${score}`;
             
-            // Show message based on score
-            if (score > 1) {
+            // Show congratulations message if target score was achieved
+            if (targetAchieved) {
                 messageElement.textContent = "Congratulations! Please collect your present from Jason.";
                 messageElement.style.display = 'block'; // Show message
             } else {
