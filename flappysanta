@@ -90,6 +90,7 @@
 <body>
     <div id="gameContainer">
         <div id="startScreen">
+            <p>Press Spacebar or Click to Start Game</p>
             <button class="button" id="startButton">Start Game</button>
         </div>
         <div id="gameOverScreen">
@@ -242,9 +243,17 @@
             obstacles = [];
         }
 
-        document.addEventListener('click', () => {
+        function jumpSanta() {
             if (gameStarted) {
                 velocity = jump; // Fixed jump height
+            }
+        }
+
+        // Add event listeners for both mouse click and spacebar
+        document.addEventListener('click', jumpSanta);
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                jumpSanta();
             }
         });
 
